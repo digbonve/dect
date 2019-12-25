@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="ch">
+<head>
+    <meta charset="UTF-8">
+    <title>时钟</title>
+    <style>
+        body{
+            background-color: #cdbdbc;
+        }
+        .wrap{
+            width: 800px;
+            margin: 0 auto;
+        }
+        canvas{
+            /*background-color: #ccc;*/
+        }
+
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <canvas id="myCanvas"></canvas>
+    </div>
+    <script>
+        (function () {
+            //获取画布
+            var canvas = document.querySelector('#myCanvas');
+
+            //设置画布大小
+            canvas.width = 800;
+            canvas.height = 700;
+
+            //获取 绘图上下文对象
+            var ctx = canvas.getContext('2d');
+
+            //初始化画布
+            clock();
+            //定时执行画布
+            setInterval(clock,1000);
+            
+            function clock() {
+                //获取时间
+                var date = new Date();
+                var s = date.getSeconds();//秒
+                var m = date.getMinutes() + s/60;//分钟
+                var h = date.getHours()+ m/60;//小时
+
+                //创建随机颜色
+                var r = Math.floor(Math.random()*256);
+                var w = Math.floor(Math.random()*256);
+                var b = Math.floor(Math.random()*256);
+                var r1 = Math.floor(Math.random()*256);
+                var g1 = Math.floor(Math.random()*256);
+                var b1 = Math.floor(Math.random()*256);
+                var o = Math.random()+0.2;
+                var o1 = Math.random()-0.2;
+                //每次执行前清空画布
+                ctx.clearRect(0,0,canvas.width*2,canvas.height*2);
+                //保存当前画布
+                ctx.save();
+                //位移画布坐标
+                ctx.translate(canvas.width/2,canvas.height/2);
+                //旋转画布
+                ctx.rotate(Math.PI*1.5);
+
+                var q = ctx.createRadialGradient(0, 0, 220, 0, 0, 320);
+                q.addColorStop(0,'rgb('+r+','+w+','+b+')');
+                q.addColorStop(.1,'rgba('+r1+','+r+','+b+','+o+')');
+                q.addColorStop(.3,'rgba('+r+','+w+','+g1+','+o+')');
+                q.addColorStop(.6,'rgba('+r+','+g1+','+r1+','+o+')');
+                q.addColorStop(1,'rgba('+b+','+g1+','+b1+','+o+')');
+                //绘制时钟的圆
+                ctx.beginPath();
+                ctx.strokeStyle = q;
+                ctx.lineWidth = 100;
+                ctx.arc(0, 0, 270, 0 , Math.PI*2);
+                ctx.stroke();
+
+                ctx.save(); //保存绘图上下文
+
+
+                //绘制分钟 时间的指向
+                for(var j = 1; j <= 60; j++){
+                    ctx.lineCap = 'round';
+                    ctx.strokeStyle = '#000066';
+                    ctx.beginPath();
+                    if(Math.floor(m) === j || j === 60 && Math.floor(m) === 0){
+                        ctx.strokeStyle = '#98fdb0';
+                    }
+                    if(s === j || j === 60 && s === 0){
+                        ctx.strokeStyle = '#d7ff15';
+                    }
+                    //绘制小时 时间的指向
+                    if(j%5 === 0){
+                        ctx.lineWidth = 8;
+                        ctx.rotate(6 / 180 * Math.PI);
+                        ctx.moveTo(190, 0);
+                        ctx.lineTo(175, 0);
+                        ctx.stroke();
+                        continue;
+                    }
+                    ctx.lineWidth = 5;
+                    ctx.rotate(6 / 180 * Math.PI);
+                    ctx.moveTo(190, 0);
+                    ctx.lineTo(186, 0);
+                    ctx.stroke();
+                }
+
+                ctx.save();//保存绘图上下文
+
+                //绘制时针
+                ctx.rotate(30 * h / 180 * Math.PI);
+
+
+                ctx.beginPath();  //开启路径
+                ctx.strokeStyle = '#000066';
+                ctx.lineWidth = 10;
+                ctx.moveTo(-15, 0);
+                ctx.lineTo(120, 0);
+                ctx.stroke();  // 描边
+
+                ctx.restore();  //恢复上一次绘图上下文
+
+                //绘制分针
+                ctx.rotate(6 * m / 180 * Math.PI);
+                ctx.beginPath();  //开启路径
+                ctx.strokeStyle = '#98fdb0';
+                ctx.lineWidth = 6;
+                ctx.lineCap = 'round';
+                ctx.moveTo(-20, 0);
+                ctx.lineTo(140, 0);
+                ctx.stroke();  // 描边
+
+                ctx.restore();  //恢复上一次绘图上下文
+                //绘制秒针
+                ctx.rotate(6 *s / 180 * Math.PI);
+                ctx.beginPath();  //开启路径
+                ctx.strokeStyle = 'rgb('+r1+','+b1+','+w+')';
+                ctx.lineCap = 'round';
+                ctx.lineWidth = 4;
+
+                ctx.moveTo(-30, 0);
+                ctx.lineTo(160, 0);
+                ctx.stroke();  // 描边
+
+              /*  ctx.beginPath();  //开启路径
+                ctx.arc(120, 0, 10, 0, Math.PI*2);
+                ctx.stroke();  // 描边
+                ctx.beginPath();  //开启路径
+                ctx.lineWidth = 3;
+                ctx.moveTo(102, 0);
+                ctx.lineTo(140  , 0);
+                ctx.stroke();  // 描边*/
+
+              //径变
+                var g = ctx.createRadialGradient(0, 0, 0, 0, 0, 200);
+                g.addColorStop(0,'rgb('+r+','+w+','+b+')');
+                g.addColorStop(.1,'rgba('+r1+','+r+','+b+','+o1+')');
+                g.addColorStop(.1,'rgba('+r+','+r1+','+g1+','+o1+')');
+                g.addColorStop(.6,'rgba('+b1+','+g1+','+r1+','+o1+')');
+                g.addColorStop(1,'rgba('+b+','+g1+','+b1+','+o1+')');
+
+                ctx.beginPath();  //开启路径
+                ctx.lineWidth = 5;
+                ctx.fillStyle = g;
+                ctx.arc(0, 0, 90, 0, Math.PI*2);
+                ctx.fill();//填充
+
+                ctx.restore();  //恢复上一次绘图上下文
+            }
+         
+
+
+        })();
+
+    </script>
+</body>
+</html>
